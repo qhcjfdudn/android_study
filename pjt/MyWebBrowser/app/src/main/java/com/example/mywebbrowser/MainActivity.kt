@@ -4,13 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.WebViewClient
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +37,8 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+        registerForContextMenu(webView)
     }
 
     override fun onBackPressed() {
@@ -63,25 +67,48 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_daum -> {
                 webView.loadUrl("https://daum.net")
-                return true
+                // return true
             }
             R.id.action_call -> {
                 val intent = Intent(Intent.ACTION_DIAL)
-                intent.data = Uri.parse("tel:031-123-4567")
+                intent.data = Uri.parse("tel:010-1234-5678")
                 if (intent.resolveActivity(packageManager) != null) {
                     startActivity(intent)
                 }
                 return true
             }
             R.id.action_send_text -> {
-                // 문자 보내기
+                sendSMS("010-1234-5678", webView.url)
                 return true
             }
             R.id.action_email -> {
-                // 이메일 보내기
+                email("jhjhyjin@naver.com", "현재 보는 사이트", webView.url)
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateContextMenu(
+        menu: ContextMenu?,
+        v: View?,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.context, menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item?.itemId) {
+            R.id.action_share -> {
+                share(webView.url)
+                return true
+            }
+            R.id.action_browser -> {
+                browse(webView.url)
+                return true
+            }
+        }
+        return super.onContextItemSelected(item)
     }
 }
